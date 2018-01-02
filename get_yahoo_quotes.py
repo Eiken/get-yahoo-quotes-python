@@ -64,7 +64,7 @@ def get_data_list(symbol, start_date, end_date, cookie, crumb):
     try:
         response = requests.get(url, cookies=cookie)
     except requests.exceptions.RequestException as e:
-        return {}
+        return []
 
     content = response.content
     if int(sys.version[0]) > 2:
