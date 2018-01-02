@@ -62,6 +62,45 @@ def get_cookie_crumb(symbol):
     return cookie, crumb
 
 
+def get_data_list(symbol, start_date, end_date, cookie, crumb):
+    url = "https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1={start_date}&period2={end_date}&interval=1d&events=history&crumb={crumb}".format(symbol=symbol, start_date=start_date, end_date=end_date, crumb=crumb)
+    try:
+        response = requests.get(url, cookies=cookie)
+    except requests.exceptions.RequestException as e:
+        return {}
+
+    lines = response.content.split('\n')
+    headers = lines[0].split(',')
+    data_list = []
+    for l in lines[1:]:
+        l = l.strip("'")
+        null_found = False
+        if not l:
+            continue
+        vals = l.split(',')
+
+        for v in vals:
+            if v == 'null':
+                null_found = True
+
+        if null_found is True:
+            continue
+
+        data = {}
+        # ['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume']
+        data['Date'] = datetime.datetime.strptime(vals[0], '%Y-%m-%d')
+        data['Open'] = float(vals[1])
+        data['High'] = float(vals[2])
+        data['Low'] = float(vals[3])
+        data['Close'] = float(vals[4])
+        data['Adj Close'] = float(vals[5])
+        data['Volume'] = int(vals[6])
+
+        data_list.append(data)
+
+    return data_list
+
+
 def get_data(symbol, start_date, end_date, cookie, crumb):
     filename = '%s.csv' % (symbol)
     url = "https://query1.finance.yahoo.com/v7/finance/download/%s?period1=%s&period2=%s&interval=1d&events=history&crumb=%s" % (symbol, start_date, end_date, crumb)
@@ -83,7 +122,14 @@ def download_quotes(symbol):
     get_data(symbol, start_date, end_date, cookie, crumb)
 
 
-if __name__ == '__main__':
+def list_quotes(symbol):
+    start_date = 0
+    end_date = get_now_epoch()
+    cookie, crumb = get_cookie_crumb(symbol)
+    get_data_list(symbol, start_date, end_date, cookie, crumb)
+
+
+def main():
     # If we have at least one parameter go ahead and loop overa all the parameters assuming they are symbols
     if len(sys.argv) == 1:
         print("\nUsage: get-yahoo-quotes.py SYMBOL\n\n")
@@ -91,6 +137,11 @@ if __name__ == '__main__':
         for i in range(1, len(sys.argv)):
             symbol = sys.argv[i]
             print("--------------------------------------------------")
-            print("Downloading %s to %s.csv" % (symbol, symbol))
-            download_quotes(symbol)
+            # print("Downloading %s to %s.csv" % (symbol, symbol))
+            # download_quotes(symbol)
+            print("List Quotes for {}".format(symbol))
+            list_quotes(symbol)
             print("--------------------------------------------------")
+
+if __name__ == '__main__':
+    main()
