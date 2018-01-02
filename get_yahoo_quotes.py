@@ -66,7 +66,10 @@ def get_data_list(symbol, start_date, end_date, cookie, crumb):
     except requests.exceptions.RequestException as e:
         return {}
 
-    lines = response.content.split('\n')
+    content = response.content
+    if int(sys.version[0]) > 2:
+        content = content.decode('UTF-8')
+    lines = content.split('\n')
     headers = lines[0].split(',')
     data_list = []
     for l in lines[1:]:
