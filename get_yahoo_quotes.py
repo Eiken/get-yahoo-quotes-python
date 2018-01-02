@@ -1,15 +1,12 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-"""
-get-yahoo-quotes.py:  Script to download Yahoo historical quotes using the new cookie authenticated site.
-
- Usage: get-yahoo-quotes SYMBOL
-
- History
-
- 06-03-2017 : Created script
-
-"""
+# get-yahoo-quotes.py:  Script to download Yahoo historical quotes using the new cookie authenticated site.
+# Usage: get-yahoo-quotes SYMBOL
+# History
+#
+# 06-03-2017 : Created script
+# 
 
 __author__ = "Brad Luicas"
 __copyright__ = "Copyright 2017, Brad Lucas"
